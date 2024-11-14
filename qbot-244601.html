@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire Q-Chatbot</title>
+    <style>
+
+        @font-face {
+            font-family: 'NeueMachina-Light';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Light.otf');
+        }
+
+        @font-face {
+            font-family: 'NeueMachina-Regular';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Regular.otf');
+        }
+
+        @font-face {
+            font-family: 'NeueMachina-Ultrabold';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Ultrabold.otf');
+        }
+
+        /* Styles de base pour le layout */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'NeueMachina-Regular', sans-serif;
+            background-color: #f5f5f5;
+        }
+        #webview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f5f5f5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        #header, #footer {
+            text-align: center;
+            font-family: 'NeueMachina-Ultrabold', sans-serif;
+        }
+        #logo {
+            margin: 40px;
+            max-width: 30%; /* Limite la largeur de l'image à celle du parent */
+            height: auto;    /* Garde les proportions de l'image */
+            object-fit: contain; /* Ajuste l'image sans la déformer */
+        }
+        #chatForm{
+            display: flex;
+            flex-direction: column;
+            height: 80%;
+        }
+        .chat-bubble {
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .question-bubble {
+            align-self: flex-start;
+            background-color: #e0e7ff;
+        }
+        .input-bubble {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        input[type="text"] {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+        #submitBtn {
+            font-family: 'NeueMachina-Regular', sans-serif;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #submitBtn:hover {
+            background-color: #45a049;
+        }
+
+    </style>
+</head>
+<body>
+    <div>
+        <div id="webview">
+            <img id="logo" alt="Logo">
+            <h1 id="shopTitle"></h1>
+            <div id="header">
+                <h2 id="formHeader"></h2>
+            </div>
+            <div id="chatForm"></div>
+            <button id="submitBtn">Envoyer</button>
+            <div id="footer">
+                <p id="formFooter"></p>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
+
+    <script>
+
+        const config = {
+            "meta": {
+                "header": "Pharmacie de Marrots questionnaire",
+                "footer": "Bien à vous"
+            },
+            "mailto": {
+                "subject": "envoi ordonnance",
+                "email": "pharma@example.com",
+                "header": "via formulaire de chez quipo {{datetime}}",
+                "footer": "fin de transmission :)"
+            },
+            "questions": {
+                "q01": "Votre nom !?",
+                "q02": "Votre prénom ?",
+                "q03": "Votre âge.."
+            }
+        };
+
+        // Récupération des paramètres de l'URL
+        function getFragmentParams() {
+            const fragment = window.location.hash.substring(1); // Remove the leading '#'
+            return fragment.split(';');
+        };
+
+        function fetchShopStyle(tsid, logoShop, titleShop, webview) {
+            // Fetch and apply the background color from SHOP JSON
+            fetch(`https://tl-cdn.occiback.dev/v1/store/${tsid}.json`)
+                .then(response => response.json())
+                .then(data => {
+                    
+                    // Vérifiez si theme_extras existe
+                    let backgroundColor = '#FCEFDE'; // Couleur par défaut
+                    let textColor = 'black'; // Couleur par défaut pour le texte
+                    if (data.theme_extras) {
+                        try {
+                            const themeExtras = JSON.parse(data.theme_extras);
+                            backgroundColor = themeExtras.store?.background || backgroundColor;
+                            textColor = themeExtras.store?.text || textColor;
+                        } catch (error) {
+                            console.error('Erreur lors de l\'analyse de theme_extras :', error);
+                        }
+                    }
+
+                    webview.style.backgroundColor = backgroundColor;
+                    webview.style.color = textColor;
+
+                    const imageUUID = data.logo_main;
+                    const fileType = data.logo_main_ftype ? data.logo_main_ftype.toLowerCase() : '';
+                    const shopTitle = data.title;
+                    const logoURL = imageUUID && fileType ? `https://tl-cdn.occiback.dev/res/logo/${imageUUID}.${fileType}`: '';
+
+                    if (logoURL) {
+                        logoShop.src = logoURL;
+                        logoShop.style.display = 'block';
+                        titleShop.innerText = shopTitle;
+                        titleShop.style.display = 'block';
+                    } else {
+                        titleShop.innerText = shopTitle;
+                        titleShop.style.display = 'block';
+                    };
+
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des styles du Shop:', error);
+                });
+            }
+
+        // Fonction pour gérer le clic du bouton "Envoyer"
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            // Récupération des réponses
+            let bodyContent = `${config.mailto.header.replace('{{datetime}}', new Date().toLocaleString())}\n\n`;
+            for (const id of Object.keys(config.questions)) {
+                const answer = document.getElementById(id).value;
+                bodyContent += `${config.questions[id]} : ${answer}\n`;
+            }
+            bodyContent += `\n${config.mailto.footer}`;
+
+            // Création du lien mailto
+            const mailtoLink = `mailto:${config.mailto.email}?subject=${encodeURIComponent(config.mailto.subject)}&body=${encodeURIComponent(bodyContent)}`;
+
+            // Ouverture du lien mailto
+            window.location.href = mailtoLink;
+        });
+
+        // Main script body
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // *** Récupération des paramètres de l'URL *** \\
+            const params = getFragmentParams();
+            const tsid = params[0]; // The first parameter is the 'tsid'
+
+            // Vérification que tous les paramètres de l'URL sont bien présent
+            if (!tsid ) {
+                console.error('Erreur : Paramètres manquants');
+                document.body.innerHTML = '<h1 style="color: red;">Erreur : Paramètres manquants.</p>';
+                return;
+            }
+
+            // *** Paramètres de service *** \\
+            const baseUrlQuipo = "https://app.quipo-app.com/mobileapp?";
+            
+            // *** SET DES CONSTANTES CSS *** \\
+
+            // Sélection des éléments pour mise en forme
+            const webview = document.getElementById('webview')
+            const header = document.getElementById('header');
+            const formHeader = document.getElementById('formHeader');
+            const chatForm = document.getElementById('chatForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const footer = document.getElementById('footer');
+            const formFooter = document.getElementById('formFooter');
+            const logoShop = document.getElementById('logo');
+            const titleShop = document.getElementById('shopTitle');
+
+            header.innerText = config.meta.header;
+            footer.innerText = config.meta.footer;
+
+            // Génération des questions du formulaire
+            for (const [id, question] of Object.entries(config.questions)) {
+                const questionBubble = document.createElement('div');
+                questionBubble.className = 'chat-bubble question-bubble';
+                questionBubble.innerText = question;
+
+                const inputBubble = document.createElement('div');
+                inputBubble.className = 'chat-bubble input-bubble';
+                
+                const inputField = document.createElement('input');
+                inputField.type = 'text';
+                inputField.id = id;
+                inputField.placeholder = 'Votre réponse ici...';
+
+                inputBubble.appendChild(inputField);
+                chatForm.appendChild(questionBubble);
+                chatForm.appendChild(inputBubble);
+            }
+            
+            // *** Récupération des données de styles *** \\
+            fetchShopStyle(tsid, logoShop, titleShop, webview);
+
+        });
+
+    </script>
+</body>

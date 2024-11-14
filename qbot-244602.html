@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire Q-Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+
+        @font-face {
+            font-family: 'NeueMachina-Light';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Light.otf');
+        }
+
+        @font-face {
+            font-family: 'NeueMachina-Regular';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Regular.otf');
+        }
+
+        @font-face {
+            font-family: 'NeueMachina-Ultrabold';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Ultrabold.otf');
+        }
+
+        /* Styles de base pour le layout */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'NeueMachina-Regular', sans-serif;
+            background-color: #f5f5f5;
+        }
+        #webview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-items: center;
+            padding: 20px;
+            max-width: 80%;
+            min-width: 60%;
+            min-height: 60%;
+            box-sizing: border-box;
+            background-color: #f5f5f5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        #header {
+            padding: 15px;
+            text-align: center;
+            font-family: 'NeueMachina-Ultrabold', sans-serif;
+            font-size: x-large;
+        }
+        #footer {
+            padding-top: 30px;
+            text-align: center;
+            font-family: 'NeueMachina-Ultrabold', sans-serif;
+            font-size: x-large;
+        }
+        #recapContainer {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background-color: #ffffff00;
+        }
+        #logo {
+            max-width: 30%; /* Limite la largeur de l'image à celle du parent */
+            height: auto;    /* Garde les proportions de l'image */
+            object-fit: contain; /* Ajuste l'image sans la déformer */
+        }
+        #chatForm{
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            width: 100%;
+            background-color: #ffffff;
+            overflow-y: auto;
+            border-radius: 20px;
+        }
+        .chat-bubble {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin: 10px;
+            min-width: 30%;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .bot-bubble {
+            background-color: #f7f7f7;
+            color: #333;
+            align-self: flex-start; /* Place à gauche */
+            border-top-left-radius: 0; /* Personnalisation des coins */
+            
+        }
+        .message-container {
+            display: flex;
+            align-items: flex-start; /* Aligner en haut de la bulle */
+            margin-bottom: 15px;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+        .user-message {
+            align-self: flex-end;
+        }
+        .user-bubble {
+            background-color: #672ce7;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+        .left-column {
+            width: 50px; /* Largeur fixe pour positionner l'avatar */
+            display: flex;
+            justify-content: center;
+        }
+        .right-column {
+            display: flex;
+            flex-direction: column;
+        }
+        .bot-name {
+            font-weight: bold;
+            color: #a1a1a1;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .user-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 50%;
+            background-color: #ffffff;
+            border-top: 1px solid #ddd;
+            border-radius: 20px;
+        }
+        .user-name {
+            font-size: 0.9em;
+            color: #a1a1a1;
+            margin-left: 20px;
+            margin-bottom: 3px;
+            padding-right: 10px;
+            text-align: right;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            border-top: 1px solid #ddd;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 0px;
+            border: 0px solid #00000000;
+            font-size: 1em;
+            margin-right: 10px;
+        }
+        #submitBtn {
+            background-color: transparent;
+            color: #3904AA;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+            padding: 0;
+        }
+        #submitBtn:hover {
+            color: #210462;
+        }
+        #disclaimer {
+            font-size: 0.8em;
+            line-height: 1.4;
+            text-wrap: wrap;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="webview">
+        <!-- Header -->
+        <img id="logo" alt="Logo">
+        <h1 id="shopTitle"></h1>
+        <div id="header">
+            <h2 id="formHeader"></h2>
+        </div>
+
+        <!-- Récapitulatif des réponses -->
+        <div id="recapContainer">
+            <!-- Les réponses de l'utilisateur apparaîtront ici -->
+        </div>
+
+        <!-- Conteneur pour structurer les échanges -->
+        <div class="user-container">
+            
+            <!-- Conteneur des questions -->
+            <div id="chatForm"></div>
+
+            <!-- Conteneur pour la réponse de l'utilisateur -->
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="Votre réponse ici...">
+                <button id="submitBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div id="footer">
+            <p id="formFooter"></p>
+        </div>
+        <p id="disclaimer">Les données renseignées ne sont ni traitées, ni récupérées par QUIPO. Elles seront uniquement utilisées pour créer un email directement sur votre appareil.</p>
+    </div>
+
+    <script>
+
+        const config = {
+            "meta": {
+                "header": "Questionnaire d'envoi d'information",
+                "footer": "Bien à vous"
+            },
+            "mailto": {
+                "subject": "Questionnaire d'information",
+                "email": "pharma@example.com",
+                "header": "via formulaire de chez quipo {{datetime}}",
+                "footer": "fin de transmission :)"
+            },
+            "questions": {
+                "q01": "Quel est votre prénom ?",
+                "q02": "Quel est votre nom ?",
+                "q03": "Quel est votre age ?"
+            }
+        };
+
+        // Initialisation des éléments de l'interface
+        const chatForm = document.getElementById('chatForm');
+        const recapContainer = document.getElementById('recapContainer');
+        const userInput = document.getElementById('userInput');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Variables de gestion de l'état
+        let currentQuestionIndex = 0;
+        let userResponses = [];
+
+        // Récupération des paramètres de l'URL
+        function getFragmentParams() {
+            const fragment = window.location.hash.substring(1); // Remove the leading '#'
+            return fragment.split(';');
+        };
+
+        // Affiche la question actuelle
+        function displayQuestion() {
+            const questionId = Object.keys(config.questions)[currentQuestionIndex];
+            const questionText = config.questions[questionId];
+            
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'message-container bot-message';
+
+            // Colonne gauche pour l'avatar du bot
+            const leftColumn = document.createElement('div');
+            leftColumn.className = 'left-column';
+
+            const avatar = document.createElement('img');
+            avatar.src = 'https://cdn.quipo-app.com/gamepage/assets/NikiTalk.png'; // Remplacez par l'URL de l'image de votre chatbot
+            avatar.className = 'chat-avatar';
+            leftColumn.appendChild(avatar);
+
+            // Colonne droite pour le nom du bot et la bulle de message
+            const rightColumn = document.createElement('div');
+            rightColumn.className = 'right-column';
+
+            const botName = document.createElement('span');
+            botName.className = 'bot-name';
+            botName.innerText = 'Niki Bot';
+
+            const questionBubble = document.createElement('div');
+            questionBubble.className = 'chat-bubble bot-bubble';
+
+            const text = document.createElement('span');
+            text.innerText = questionText;
+
+            questionBubble.appendChild(text);
+            rightColumn.appendChild(botName);
+            rightColumn.appendChild(questionBubble);
+
+            messageContainer.appendChild(leftColumn);
+            messageContainer.appendChild(rightColumn);
+            
+            chatForm.appendChild(messageContainer);
+        }
+
+        // Affiche la réponse
+        function displayUserMessage(userText) {
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'message-container user-message';
+
+            // Colonne gauche vide pour garder la structure
+            const leftColumn = document.createElement('div');
+            leftColumn.className = 'left-column';
+
+            // Colonne droite pour le pronom et la bulle de message utilisateur
+            const rightColumn = document.createElement('div');
+            rightColumn.className = 'right-column';
+
+            // Pronom 'Vous'
+            const userName = document.createElement('span');
+            userName.className = 'user-name';
+            userName.innerText = 'Vous';
+
+            // Bulle de message utilisateur
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble user-bubble';
+
+            const text = document.createElement('span');
+            text.innerText = userText;
+
+            userBubble.appendChild(text);
+            rightColumn.appendChild(userName);
+            rightColumn.appendChild(userBubble);
+
+            messageContainer.appendChild(leftColumn);
+            messageContainer.appendChild(rightColumn);
+
+            chatForm.appendChild(messageContainer);
+        }
+
+        // Affiche la réponse de l'utilisateur dans le récapitulatif
+        function updateRecap(question, answer) {
+            const recapItem = document.createElement('div');
+            recapItem.innerHTML = `<strong>${question}:</strong> ${answer}`;
+            recapContainer.appendChild(recapItem);
+        }
+
+        // Gère la progression des questions et réponses
+        function handleNext() {
+            const answer = userInput.value.trim();
+            if (answer === "") return;
+
+            // Ajouter la réponse de l'utilisateur au tableau des réponses
+            const questionId = Object.keys(config.questions)[currentQuestionIndex];
+            const questionText = config.questions[questionId];
+            userResponses.push({ question: questionText, answer: answer });
+
+            // Afficher la réponse de l'utilisateur avec le format "Vous"
+            displayUserMessage(answer); // Afficher la réponse en utilisant displayUserMessage
+
+            // Ajouter au récapitulatif
+            updateRecap(questionText, answer);
+
+            // Préparer la question suivante
+            userInput.value = "";  // Vider le champ de texte
+            currentQuestionIndex++;
+
+            // Vérifier s'il reste des questions
+            if (currentQuestionIndex < Object.keys(config.questions).length) {
+                displayQuestion();
+            } else {
+                displayGenerateEmailButton();
+            }
+        }
+
+        // Générer le bouton d'envoi d'email
+        function displayGenerateEmailButton() {
+            // Cacher le champ de saisie et le bouton "Suivant"
+            userInput.style.display = 'none';
+            submitBtn.style.display = 'none';
+
+            // Créer un bouton "Générer l'email"
+            const generateEmailBtn = document.createElement('button');
+            generateEmailBtn.innerText = "Générer l'email";
+            generateEmailBtn.id = 'generateEmailBtn';
+            generateEmailBtn.style.backgroundColor = '#4CAF50';
+            generateEmailBtn.style.color = 'white';
+            generateEmailBtn.style.padding = '10px 20px';
+            generateEmailBtn.style.border = 'none';
+            generateEmailBtn.style.borderRadius = '5px';
+            generateEmailBtn.style.cursor = 'pointer';
+            generateEmailBtn.style.marginTop = '15px';
+
+            // Ajouter le bouton au formulaire
+            chatForm.appendChild(generateEmailBtn);
+
+            // Attacher l'événement de clic pour générer l'email
+            generateEmailBtn.addEventListener('click', finishForm);
+        }
+
+        // Récupère les données du style d'une enseigne
+        function fetchShopStyle(tsid, logoShop, titleShop, webview) {
+            // Fetch and apply the background color from SHOP JSON
+            fetch(`https://tl-cdn.occiback.dev/v1/store/${tsid}.json`)
+                .then(response => response.json())
+                .then(data => {
+                    
+                    // Vérifiez si theme_extras existe
+                    let backgroundColor = '#FCEFDE'; // Couleur par défaut
+                    let textColor = 'black'; // Couleur par défaut pour le texte
+                    if (data.theme_extras) {
+                        try {
+                            const themeExtras = JSON.parse(data.theme_extras);
+                            backgroundColor = themeExtras.store?.background || backgroundColor;
+                            textColor = themeExtras.store?.text || textColor;
+                        } catch (error) {
+                            console.error('Erreur lors de l\'analyse de theme_extras :', error);
+                        }
+                    }
+
+                    webview.style.backgroundColor = backgroundColor;
+                    webview.style.color = textColor;
+
+                    const imageUUID = data.logo_main;
+                    const fileType = data.logo_main_ftype ? data.logo_main_ftype.toLowerCase() : '';
+                    const shopTitle = data.title;
+                    const logoURL = imageUUID && fileType ? `https://tl-cdn.occiback.dev/res/logo/${imageUUID}.${fileType}`: '';
+
+                    if (logoURL) {
+                        logoShop.src = logoURL;
+                        logoShop.style.display = 'block';
+                        titleShop.innerText = shopTitle;
+                        titleShop.style.display = 'block';
+                    } else {
+                        titleShop.innerText = shopTitle;
+                        titleShop.style.display = 'block';
+                    };
+
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des styles du Shop:', error);
+                });
+            }
+
+        // Terminer le formulaire et créer le lien mailto
+        function finishForm() {
+            // Création du contenu pour le mail
+            const bodyContent = `${config.mailto.header.replace('{{datetime}}', new Date().toLocaleString())}\n\n` +
+                userResponses.map(resp => `${resp.question}: ${resp.answer}`).join('\n') +
+                `\n\n${config.mailto.footer}`;
+            const mailtoLink = `mailto:${config.mailto.email}?subject=${encodeURIComponent(config.mailto.subject)}&body=${encodeURIComponent(bodyContent)}`;
+
+            // Ouvrir le lien mailto pour l'envoi
+            window.location.href = mailtoLink;
+        }
+
+        // Fonction pour gérer le clic sur le bouton "Suivant"
+        submitBtn.addEventListener('click', handleNext);
+
+        // Fonction pour gérer l'appui sur la touche Enter sur le bouton "Suivant"
+        userInput.addEventListener('keypress', function(event) {
+            // Vérifie si la touche appuyée est "Enter"
+            if (event.key === "Enter") {
+                event.preventDefault(); // Empêche le comportement par défaut (par ex. rafraîchir la page)
+                handleNext(); // Appelle la fonction pour envoyer la réponse
+            }
+        });
+
+        // Main script body
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // *** Récupération des paramètres de l'URL *** \\
+            const params = getFragmentParams();
+            const tsid = params[0]; // The first parameter is the 'tsid'
+
+            // Vérification que tous les paramètres de l'URL sont bien présent
+            if (!tsid ) {
+                console.error('Erreur : Paramètres manquants');
+                document.body.innerHTML = '<h1 style="color: red;">Erreur : Paramètres manquants.</p>';
+                return;
+            }
+
+            // *** Paramètres de service *** \\
+            const baseUrlQuipo = "https://app.quipo-app.com/mobileapp?";
+            
+            // *** SET DES CONSTANTES CSS *** \\
+
+            // Sélection des éléments pour mise en forme
+            const webview = document.getElementById('webview')
+            const header = document.getElementById('header');
+            const formHeader = document.getElementById('formHeader');
+            const chatForm = document.getElementById('chatForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const footer = document.getElementById('footer');
+            const formFooter = document.getElementById('formFooter');
+            const logoShop = document.getElementById('logo');
+            const titleShop = document.getElementById('shopTitle');
+
+            header.innerText = config.meta.header;
+            footer.innerText = config.meta.footer;
+            
+            // *** Récupération des données de styles *** \\
+            fetchShopStyle(tsid, logoShop, titleShop, webview);
+
+            // Afficher la première question
+            displayQuestion();
+
+        });
+
+    </script>
+</body>
