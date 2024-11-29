@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire Q-Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+
+        @font-face {
+            font-family: 'NeueMachina-Light';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Light.otf');
+        }
+
+        @font-face {
+            font-family: 'NeueMachina-Regular';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Regular.otf');
+        }
+
+        @font-face {
+            font-family: 'NeueMachina-Ultrabold';
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Ultrabold.otf');
+        }
+
+        /* Styles de base pour le layout */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'NeueMachina-Regular', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        strong{
+            font-family: 'NeueMachina-Ultrabold', sans-serif;
+        }
+
+        /* Conteneur principal */
+        #webview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            min-height: 60%;
+            box-sizing: border-box;
+            background-color: #f5f5f5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        #header {
+            padding: 15px;
+            text-align: center;
+            font-family: 'NeueMachina-Ultrabold', sans-serif;
+            font-size: 1.5rem;
+        }
+
+        #footer {
+            padding-top: 20px;
+            text-align: center;
+            font-family: 'NeueMachina-Ultrabold', sans-serif;
+            font-size: 1rem;
+        }
+
+        #recapContainer {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            width: 80%;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffffbb;
+            color: #210462;
+        }
+
+        #logo {
+            max-width: 100px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        #shopTitle {
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        /* Formulaire */
+        #chatForm {
+            display: flex;
+            flex-direction: column;
+            height: 300px;
+            width: 100%;
+            background-color: #ffffff;
+            overflow-y: auto;
+            border-radius: 20px;
+            margin-top: 20px;
+        }
+
+        /* Bulles de chat */
+        .chat-bubble {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin: 10px;
+            min-width: 30%;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .bot-bubble {
+            background-color: #f7f7f7;
+            color: #333;
+            align-self: flex-start;
+            border-top-left-radius: 0;
+        }
+
+        .user-bubble {
+            background-color: #672ce7;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+
+        .message-container {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 20px;
+        }
+
+        .user-message {
+            align-self: flex-end;
+        }
+
+        .left-column {
+            width: 50px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bot-name {
+            font-weight: bold;
+            color: #a1a1a1;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            background-color: #ffffff;
+            border-top: 1px solid #ddd;
+            border-radius: 15px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 15px 10px;
+            border-top: 1px solid #ddd;
+            width: 80%;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            font-size: 1em;
+            margin-right: 10px;
+        }
+
+        #submitBtn {
+            background-color: transparent;
+            color: #3904AA;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+        }
+
+        #submitBtn:hover {
+            color: #210462;
+        }
+
+        #disclaimer {
+            font-size: 0.8em;
+            line-height: 1.4;
+            text-wrap: wrap;
+        }
+
+        /* Animations */
+
+        /* Animation fade-in pour les messages */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animation pour les points clignotants */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 20px;
+            margin: 10px 0;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin: 0 3px;
+            background-color: #aaa;
+            border-radius: 50%;
+            animation: blink 0.6s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes blink {
+            0%, 80%, 100% {
+                opacity: 0;
+            }
+            40% {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Styles */
+
+        /* Petits écrans (smartphones portrait) */
+        @media (max-width: 600px) {
+            #webview {
+                width: 90%;
+                padding: 10px;
+            }
+
+            #header, #footer {
+                font-size: 1.2rem;
+            }
+
+            #shopTitle {
+                font-size: 1rem;
+            }
+
+            .chat-bubble {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .bot-name {
+                font-size: 12px;
+            }
+
+            input[type="text"] {
+                font-size: 0.9em;
+            }
+
+            #submitBtn {
+                font-size: 1.2em;
+            }
+        }
+
+        /* Tablettes en mode paysage */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            #webview {
+                width: 70%;
+            }
+
+            #header, #footer {
+                font-size: 1.5rem;
+            }
+
+            #shopTitle {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Ordinateurs de bureau */
+        @media (min-width: 1025px) {
+            #webview {
+                width: 50%;
+                max-width: 800px;
+            }
+
+            #header, #footer {
+                font-size: 1.8rem;
+            }
+
+            #shopTitle {
+                font-size: 1.5rem;
+            }
+
+            .chat-bubble {
+                font-size: 16px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id="webview">
+        <!-- Header -->
+        <img id="logo" alt="Logo">
+        <h1 id="shopTitle"></h1>
+        <div id="header">
+            <h2 id="formHeader"></h2>
+        </div>
+
+        <!-- Récapitulatif des réponses -->
+        <div id="recapContainer">
+            <!-- Les réponses de l'utilisateur apparaîtront ici -->
+        </div>
+
+        <!-- Conteneur pour structurer les échanges -->
+        <div class="user-container">
+            
+            <!-- Conteneur des questions -->
+            <div id="chatForm"></div>
+
+            <!-- Conteneur pour la réponse de l'utilisateur -->
+            <div class="input-container" id="inputCont">
+                <input type="text" id="userInput" placeholder="Votre réponse ici...">
+                <button id="submitBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div id="footer">
+            <p id="formFooter"></p>
+        </div>
+        <p id="disclaimer">Les données renseignées ne sont ni traitées, ni récupérées par QUIPO. Elles seront uniquement utilisées pour créer un email directement sur votre appareil.</p>
+
+    </div>
+
+    <script>
+
+        // Main script body
+        document.addEventListener("DOMContentLoaded", () => {
+            // *** SET DES CONSTANTES CSS *** \\
+
+            // Sélection des éléments pour mise en forme
+            const webview = document.getElementById('webview')
+            const header = document.getElementById('header');
+            const formHeader = document.getElementById('formHeader');
+            const chatForm = document.getElementById('chatForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const footer = document.getElementById('footer');
+            const formFooter = document.getElementById('formFooter');
+            const logoShop = document.getElementById('logo');
+            const titleShop = document.getElementById('shopTitle');
+            const userInput = document.getElementById('userInput');
+            const inputCont = document.getElementById('inputCont');
+            const errorPopup = document.getElementById('errorPopup');
+            const errorMessage = document.getElementById('errorMessage');
+            const closePopupButton = document.getElementById('closePopup');
+
+            // Variable globale pour stocker la configuration
+            let config = null;
+
+            // Récupération des paramètres de l'URL
+            function getFragmentParams() {
+                const fragment = window.location.hash.substring(1); // Remove the leading '#'
+                return fragment.split(';');
+            };
+
+            const fragment = getFragmentParams();
+            const configid = fragment[1]; // The 2nd parameter is the 'configid'
+
+            // Vérification des paramètres de l'URL
+            if (!configid) {
+                console.error('Erreur : Paramètre configid manquant');
+                document.body.innerHTML = '<h1 style="color: red;">Erreur : Paramètre configid manquant.</h1>';
+                return;
+            }
+
+            // Fetch chatbotconfig
+            fetch(`https://tl-cdn.occiback.dev/v2/chatbotconfig/${configid}.json`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    config = data; // Stocker la configuration globalement
+                    header.innerText = config.meta?.header || "Default Header";
+                    footer.innerText = config.meta?.footer || "Default Footer";
+                    console.log("Config chargée :", config);
+
+                    // Démarrer le questionnaire après le chargement des données
+                    displayQuestion();
+                })
+                .catch(error => {
+                    showErrorPopup(`Erreur lors de la récupération de la configuration : ${error.message}`);
+                    console.error('Erreur lors de la récupération de la configuration:', error);
+                });
+
+            // *** Définition des fonctions *** \\
+
+            // Variables de gestion de l'état
+            let currentQuestionIndex = 0;
+            let userResponses = [];
+
+            // Affiche la question actuelle
+            function displayQuestion() {
+                userInput.disabled=true;
+                const questionId = Object.keys(config.questions)[currentQuestionIndex];
+                const questionText = config.questions[questionId];
+                const chatForm = document.getElementById('chatForm');
+
+                // Ajouter l'indicateur de "saisie en cours"
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = `<span></span><span></span><span></span>`;
+                chatForm.appendChild(typingIndicator);
+
+                // Simuler un délai avant d'afficher la question
+                setTimeout(() => {
+                    // Supprimer l'indicateur de saisie
+                    typingIndicator.remove();
+
+                    // Créer le conteneur de message du bot
+                    const messageContainer = document.createElement('div');
+                    messageContainer.className = 'message-container bot-message';
+                    messageContainer.style.animation = 'fadeIn 0.5s'; // Animation smooth
+
+                    // Colonne gauche pour l'avatar du bot
+                    const leftColumn = document.createElement('div');
+                    leftColumn.className = 'left-column';
+
+                    const avatar = document.createElement('img');
+                    avatar.src = 'https://cdn.quipo-app.com/gamepage/assets/NikiTalk.png'; // Remplacez par l'URL de l'image de votre chatbot
+                    avatar.className = 'chat-avatar';
+                    leftColumn.appendChild(avatar);
+
+                    // Colonne droite pour le nom du bot et la bulle de message
+                    const rightColumn = document.createElement('div');
+                    rightColumn.className = 'right-column';
+
+                    const botName = document.createElement('span');
+                    botName.className = 'bot-name';
+                    botName.innerText = 'Niki Bot';
+
+                    const questionBubble = document.createElement('div');
+                    questionBubble.className = 'chat-bubble bot-bubble';
+
+                    const text = document.createElement('span');
+                    text.innerText = questionText;
+
+                    questionBubble.appendChild(text);
+                    rightColumn.appendChild(botName);
+                    rightColumn.appendChild(questionBubble);
+
+                    messageContainer.appendChild(leftColumn);
+                    messageContainer.appendChild(rightColumn);
+
+                    chatForm.appendChild(messageContainer);
+                    chatForm.scrollTop = chatForm.scrollHeight; // Scroll vers le bas
+                    userInput.disabled=false;
+                }, 800); // Délai de 1,5 secondes pour simuler la saisie
+            }
+
+            // Affiche la réponse
+            function displayUserMessage(userText) {
+                const chatForm = document.getElementById('chatForm');
+
+                // Créer le conteneur de message de l'utilisateur
+                const messageContainer = document.createElement('div');
+                messageContainer.className = 'message-container user-message';
+                messageContainer.style.animation = 'fadeIn 0.5s'; // Animation smooth
+
+                // Colonne gauche vide pour garder la structure
+                const leftColumn = document.createElement('div');
+                leftColumn.className = 'left-column';
+
+                // Colonne droite pour le pronom et la bulle de message utilisateur
+                const rightColumn = document.createElement('div');
+                rightColumn.className = 'right-column';
+
+                // Pronom 'Vous'
+                const userName = document.createElement('span');
+                userName.className = 'user-name';
+                userName.innerText = 'Vous';
+
+                // Bulle de message utilisateur
+                const userBubble = document.createElement('div');
+                userBubble.className = 'chat-bubble user-bubble';
+
+                const text = document.createElement('span');
+                text.innerText = userText;
+
+                userBubble.appendChild(text);
+                rightColumn.appendChild(userName);
+                rightColumn.appendChild(userBubble);
+
+                messageContainer.appendChild(leftColumn);
+                messageContainer.appendChild(rightColumn);
+
+                chatForm.appendChild(messageContainer);
+                chatForm.scrollTop = chatForm.scrollHeight; // Scroll vers le bas
+            }
+
+            // Affiche la réponse de l'utilisateur dans le récapitulatif
+            function updateRecap(question, answer) {
+                const recapItem = document.createElement('div');
+                recapItem.innerHTML = `<strong>${question}:</strong> ${answer}`;
+                recapContainer.appendChild(recapItem);
+            }
+
+            // Gère la progression des questions et réponses
+            function handleNext() {
+                const answer = userInput.value.trim();
+                if (answer === "") return;
+
+                // Ajouter la réponse de l'utilisateur au tableau des réponses
+                const questionId = Object.keys(config.questions)[currentQuestionIndex];
+                const questionText = config.questions[questionId];
+                userResponses.push({ question: questionText, answer: answer });
+
+                // Afficher la réponse de l'utilisateur avec le format "Vous"
+                displayUserMessage(answer); // Afficher la réponse en utilisant displayUserMessage
+
+                // Ajouter au récapitulatif
+                updateRecap(questionId, answer);
+
+                // Préparer la question suivante
+                userInput.value = "";  // Vider le champ de texte
+                currentQuestionIndex++;
+
+                // Vérifier s'il reste des questions
+                if (currentQuestionIndex < Object.keys(config.questions).length) {
+                    displayQuestion();
+                } else {
+                    displayGenerateEmailButton();
+                }
+                chatForm.scrollTop = chatForm.scrollHeight;
+            }
+
+            // Générer le bouton d'envoi d'email
+            function displayGenerateEmailButton() {
+                // Vérifier que les éléments existent
+                if (userInput && submitBtn && inputCont) {
+                    // Cacher le champ de saisie et le bouton "Suivant"
+                    userInput.style.display = 'none';
+                    submitBtn.style.display = 'none';
+
+                    // Supprimer le conteneur d'entrée pour éviter des conflits avec le nouveau bouton
+                    inputCont.innerHTML = '';
+
+                    // Création d'un conteneur pour afficher le bouton
+                    const sendEmailFrame = document.createElement('div');
+                    sendEmailFrame.id = 'sendEmailFrame';
+                    sendEmailFrame.style.width = '100%';
+                    sendEmailFrame.style.display = 'flex';
+                    sendEmailFrame.style.justifyContent = 'center';
+
+                    // Créer un bouton "Générer l'email"
+                    const generateEmailBtn = document.createElement('button');
+                    generateEmailBtn.innerText = "Générer l'email";
+                    generateEmailBtn.id = 'generateEmailBtn';
+                    generateEmailBtn.style.backgroundColor = '#4CAF50';
+                    generateEmailBtn.style.color = 'white';
+                    generateEmailBtn.style.fontSize= '1.6em';
+                    generateEmailBtn.style.padding = '10px 20px'; // Un padding horizontal plus généreux pour une meilleure lisibilité
+                    generateEmailBtn.style.border = 'none';
+                    generateEmailBtn.style.borderRadius = '5px';
+                    generateEmailBtn.style.cursor = 'pointer';
+                    generateEmailBtn.style.whiteSpace = 'nowrap'; // Empêche le texte de se couper si trop long
+                    generateEmailBtn.style.display = 'inline-block';
+
+                    // Ajouter le bouton au conteneur
+                    sendEmailFrame.appendChild(generateEmailBtn);
+                    inputCont.appendChild(sendEmailFrame);
+
+                    // Attacher l'événement de clic pour générer l'email
+                    generateEmailBtn.addEventListener('click', finishForm);
+                } else {
+                    console.error('Un ou plusieurs éléments sont introuvables dans le DOM.');
+                }
+            }
+
+            // Récupère les données du style d'une enseigne
+            function fetchShopStyle(tsid, logoShop, titleShop, webview) {
+                // Fetch and apply the background color from SHOP JSON
+                fetch(`https://tl-cdn.occiback.dev/v1/store/${tsid}.json`)
+                    .then(response => response.json())
+                    .then(data => {
+                        
+                        // Vérifiez si theme_extras existe
+                        let backgroundColor = '#FCEFDE'; // Couleur par défaut
+                        let textColor = 'black'; // Couleur par défaut pour le texte
+                        if (data.theme_extras) {
+                            try {
+                                const themeExtras = JSON.parse(data.theme_extras);
+                                backgroundColor = themeExtras.store?.background || backgroundColor;
+                                textColor = themeExtras.store?.text || textColor;
+                            } catch (error) {
+                                console.error('Erreur lors de l\'analyse de theme_extras :', error);
+                            }
+                        }
+
+                        webview.style.backgroundColor = backgroundColor;
+                        webview.style.color = textColor;
+
+                        const imageUUID = data.logo_main;
+                        const fileType = data.logo_main_ftype ? data.logo_main_ftype.toLowerCase() : '';
+                        const shopTitle = data.title;
+                        const logoURL = imageUUID && fileType ? `https://tl-cdn.occiback.dev/res/logo/${imageUUID}.${fileType}`: '';
+
+                        if (logoURL) {
+                            logoShop.src = logoURL;
+                            logoShop.style.display = 'block';
+                            titleShop.innerText = shopTitle;
+                            titleShop.style.display = 'block';
+                        } else {
+                            logoShop.style.display = 'none';
+                            titleShop.innerText = shopTitle;
+                            titleShop.style.display = 'block';
+                        };
+
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la récupération des styles du Shop:', error);
+                    });
+                }
+
+            // Terminer le formulaire et créer le lien mailto
+            function finishForm() {
+                // Création du contenu pour le mail
+                const bodyContent = `${config.mailto.header.replace('{{datetime}}', new Date().toLocaleString())}\n\n` +
+                    userResponses.map(resp => `${resp.question}: ${resp.answer}`).join('\n') +
+                    `\n\n${config.mailto.footer}`;
+                const mailtoLink = `mailto:${config.mailto.email}?subject=${encodeURIComponent(config.mailto.subject)}&body=${encodeURIComponent(bodyContent)}`;
+
+                // Ouvrir le lien mailto pour l'envoi
+                window.location.href = mailtoLink;
+            }
+
+            // *** Récupération des paramètres de l'URL *** \\
+            const params = getFragmentParams();
+            const tsid = params[0]; // The first parameter is the 'tsid'
+
+            // Vérification que tous les paramètres de l'URL sont bien présent
+            if (!tsid ) {
+                console.error('Erreur : Paramètres manquants');
+                document.body.innerHTML = '<h1 style="color: red;">Erreur : Paramètres manquants.</p>';
+                return;
+            }
+
+            // *** Paramètres de service *** \\
+            const baseUrlQuipo = "https://app.quipo-app.com/mobileapp?";
+
+            // *** Récupération des données de styles *** \\
+            fetchShopStyle(tsid, logoShop, titleShop, webview);
+
+            // Afficher la première question
+            displayQuestion();
+
+            // Fonction pour gérer le clic sur le bouton "Suivant"
+            submitBtn.addEventListener('click', handleNext);
+
+            // Fonction pour gérer l'appui sur la touche Enter sur le bouton "Suivant"
+            userInput.addEventListener('keydown', function(event) {
+                // Vérifie si la touche appuyée est "Enter"
+                if (event.key === "Enter") {
+                    event.preventDefault(); // Empêche le comportement par défaut (par ex. rafraîchir la page)
+                    handleNext(); // Appelle la fonction pour envoyer la réponse
+                }
+            });
+
+
+        });
+    </script>
+</body>
