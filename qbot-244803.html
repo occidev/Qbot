@@ -414,7 +414,22 @@
                 try {
                     const response = await fetch(`https://tl-cdn.occiback.dev/v2/chatbotconfig/${configid}.json`);
                     if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
-                    return await response.json();
+        
+                    const config = await response.json();
+
+                    // Réorganiser les questions par ordre alphabétique des clés
+                    if (config.questions && typeof config.questions === 'object') {
+                        const sortedQuestions = Object.keys(config.questions)
+                            .sort() // Tri alphabétique des clés
+                            .reduce((acc, key) => {
+                                acc[key] = config.questions[key]; // Reconstruire l'objet avec les clés triées
+                                return acc;
+                            }, {});
+
+                        config.questions = sortedQuestions; // Remplacer l'objet questions par l'objet trié
+                    }
+
+                    return config;
                 } catch (error) {
                     console.error("Erreur lors de la récupération de la configuration :", error);
                     throw error;
@@ -666,6 +681,7 @@
                 }
 
                 config = await fetchConfigId(configid);
+                console.log("init: ",config);
 
                 if (config?.meta) {
                     header.innerText = config.meta.header;

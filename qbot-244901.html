@@ -97,7 +97,7 @@
         #chatForm {
             display: flex;
             flex-direction: column;
-            height: 300px;
+            height: 220px;
             width: 100%;
             background-color: #ffffff;
             overflow-y: auto;
@@ -112,7 +112,8 @@
             border-radius: 15px;
             margin: 10px;
             min-width: 30%;
-            font-size: 14px;
+            font-family: Verdana;
+            font-size: 18px;
             line-height: 1.4;
             word-wrap: break-word;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -163,7 +164,7 @@
             font-weight: bold;
             color: #a1a1a1;
             margin-bottom: 5px;
-            font-size: 14px;
+            font-size: 0.8em;
         }
 
         .chat-avatar {
@@ -171,6 +172,14 @@
             height: 40px;
             border-radius: 50%;
             margin-right: 10px;
+        }
+
+        .user-name {
+            font-size: 0.8em;
+            text-align: right;
+            font-weight: bold;
+            color: #6d6d6d;
+            margin-bottom: 5px;
         }
 
         .user-container {
@@ -187,7 +196,7 @@
             display: flex;
             align-items: center;
             background-color: #ffffff;
-            padding: 15px 10px;
+            padding: 10px 10px;
             border-top: 1px solid #ddd;
             width: 80%;
         }
@@ -205,7 +214,7 @@
             color: #3904AA;
             border: none;
             cursor: pointer;
-            font-size: 1.5em;
+            font-size: 1.2em;
         }
 
         #submitBtn:hover {
@@ -286,7 +295,7 @@
             }
 
             .chat-bubble {
-                font-size: 12px;
+                font-size: 14px;
                 padding: 8px 12px;
             }
 
@@ -414,7 +423,22 @@
                 try {
                     const response = await fetch(`https://tl-cdn.occiback.dev/v2/chatbotconfig/${configid}.json`);
                     if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
-                    return await response.json();
+        
+                    const config = await response.json();
+
+                    // Réorganiser les questions par ordre alphabétique des clés
+                    if (config.questions && typeof config.questions === 'object') {
+                        const sortedQuestions = Object.keys(config.questions)
+                            .sort() // Tri alphabétique des clés
+                            .reduce((acc, key) => {
+                                acc[key] = config.questions[key]; // Reconstruire l'objet avec les clés triées
+                                return acc;
+                            }, {});
+
+                        config.questions = sortedQuestions; // Remplacer l'objet questions par l'objet trié
+                    }
+
+                    return config;
                 } catch (error) {
                     console.error("Erreur lors de la récupération de la configuration :", error);
                     throw error;
@@ -506,7 +530,7 @@
 
                     const botName = document.createElement('span');
                     botName.className = 'bot-name';
-                    botName.innerText = 'Niki Bot';
+                    botName.innerText = 'Assistant QUIPO';
 
                     const questionBubble = document.createElement('div');
                     questionBubble.className = 'chat-bubble bot-bubble';
@@ -666,6 +690,7 @@
                 }
 
                 config = await fetchConfigId(configid);
+                console.log("init: ",config);
 
                 if (config?.meta) {
                     header.innerText = config.meta.header;
