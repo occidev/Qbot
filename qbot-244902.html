@@ -9,17 +9,17 @@
 
         @font-face {
             font-family: 'NeueMachina-Light';
-            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Light.otf');
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/bookerly/Bookerly Light.ttf');
         }
 
         @font-face {
             font-family: 'NeueMachina-Regular';
-            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Regular.otf');
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/bookerly/Bookerly.ttf');
         }
 
         @font-face {
             font-family: 'NeueMachina-Ultrabold';
-            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/NeueMachina/NeueMachina-Ultrabold.otf');
+            src: url('https://cdn.quipo-app.com/gamepage/assets/fonts/bookerly/Bookerly Bold.ttf');
         }
 
         /* Styles de base pour le layout */
@@ -53,50 +53,69 @@
             border-radius: 10px;
         }
 
+        #logo {
+            max-width: 100px;
+            height: 10vh;
+            object-fit: contain;
+        }
+        #shopTitle {
+            font-size: 1.2rem;
+            height: 3vh;
+            text-align: center;
+            margin: 10px 0;
+        }
         #header {
             padding: 15px;
             text-align: center;
             font-family: 'NeueMachina-Ultrabold', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            height:5vh;
         }
-
-        #footer {
-            padding-top: 20px;
-            text-align: center;
-            font-family: 'NeueMachina-Ultrabold', sans-serif;
-            font-size: 1rem;
-        }
-
         #recapContainer {
-            max-height: 150px;
+            height: 20vh;
             overflow-y: auto;
             margin-bottom: 20px;
+            margin-top: 20px;
+            padding-top: 5px;
+            padding-left: 10px;
             width: 80%;
-            padding: 20px;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
             background-color: #ffffffbb;
             color: #210462;
+            font-family: 'NeueMachina-Light';
+            font-size: 1em;
         }
-
-        #logo {
-            max-width: 100px;
-            height: auto;
-            object-fit: contain;
+        .user-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'NeueMachina-Light';
+            height: 50vh;
+            width: 95%;
+            background-color: #ffffff;
+            border-top: 1px solid #ddd;
+            border-radius: 15px;
         }
-
-        #shopTitle {
-            font-size: 1.2rem;
+        #footer {
             text-align: center;
-            margin: 10px 0;
+            font-family: 'NeueMachina-Ultrabold', sans-serif;
+            font-size: 1rem;
+            height:3vh;
+        }
+        #disclaimer {
+            font-size: 0.8em;
+            line-height: 1.2;
+            text-wrap: wrap;
+            height:3vh;
         }
 
         /* Formulaire */
         #chatForm {
             display: flex;
             flex-direction: column;
-            height: 300px;
+            height: 90%;
             width: 100%;
             background-color: #ffffff;
             overflow-y: auto;
@@ -111,8 +130,8 @@
             border-radius: 15px;
             margin: 10px;
             min-width: 30%;
-            font-family: Verdana;
-            font-size: 16px;
+            font-family: 'NeueMachina-Regular';
+            font-size: 1.1em;
             line-height: 1.4;
             word-wrap: break-word;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -159,10 +178,10 @@
         }
 
         .bot-name {
-            font-weight: bold;
-            color: #a1a1a1;
+            font-family: 'NeueMachina-Light';
+            color: #6d6d6d;
             margin-bottom: 5px;
-            font-size: 0.8em;
+            font-size: 1em;
         }
 
         .chat-avatar {
@@ -173,21 +192,12 @@
         }
 
         .user-name {
-            font-size: 0.8em;
+            font-size: 1em;
+            font-family: 'NeueMachina-Light';
             text-align: right;
             font-weight: bold;
             color: #6d6d6d;
             margin-bottom: 5px;
-        }
-
-        .user-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 65%;
-            background-color: #ffffff;
-            border-top: 1px solid #ddd;
-            border-radius: 15px;
         }
 
         .input-container {
@@ -197,18 +207,20 @@
             padding: 10px 10px;
             border-top: 1px solid #ddd;
             width: 80%;
+            height: 10%;
         }
 
         input[type="text"] {
             flex-grow: 1;
             padding: 10px;
             border: none;
-            font-size: 1em;
+            font-size: 1.1em;
             margin-right: 10px;
         }
 
         #submitBtn {
             background-color: transparent;
+            font-family: 'NeueMachina-Regular';
             color: #3904AA;
             border: none;
             cursor: pointer;
@@ -217,12 +229,6 @@
 
         #submitBtn:hover {
             color: #210462;
-        }
-
-        #disclaimer {
-            font-size: 0.8em;
-            line-height: 1.4;
-            text-wrap: wrap;
         }
 
         /* Animations */
@@ -278,81 +284,42 @@
         /* Responsive Styles */
 
         /* Petits écrans (smartphones portrait) */
-        @media (max-width: 600px) {
-            #webview {
-                width: 90%;
-                padding: 10px;
+        @media (max-width: 400px) {
+            #header {
+                font-size: 1em;
             }
-
-            #header, #footer {
-                font-size: 1.2rem;
+            #disclaimer {
+                font-size: 0.6em;
             }
-
-            #shopTitle {
-                font-size: 1rem;
-            }
-
-            #chatForm {
-                height: 220px;
-            }
-
             .chat-bubble {
-                font-size: 14px;
-                padding: 8px 12px;
+                font-size: 1em;
             }
-
-            .bot-name {
-                font-size: 12px;
+            #recapContainer {
+                font-size: 1em;
             }
-
             input[type="text"] {
-                font-size: 0.9em;
+                font-size: 1em;
             }
-
             #submitBtn {
                 font-size: 1.2em;
             }
-
             .user-container {
-                width: 100%;
+                height: 55vh;
+            }
+            #footer {
+                font-size: 1em;
             }
         }
 
-        /* Tablettes en mode paysage */
-        @media (min-width: 601px) and (max-width: 1024px) {
-            #webview {
-                width: 70%;
+        /* Tablettes en mode paysage & desktop */
+        @media (min-width: 601px) {
+            .user-container {
+                Width: 500px;
             }
-
-            #header, #footer {
-                font-size: 1.5rem;
-            }
-
-            #shopTitle {
-                font-size: 1.2rem;
+            #recapContainer {
+                width: 500px;
             }
         }
-
-        /* Ordinateurs de bureau */
-        @media (min-width: 1025px) {
-            #webview {
-                width: 50%;
-                max-width: 800px;
-            }
-
-            #header, #footer {
-                font-size: 1.8rem;
-            }
-
-            #shopTitle {
-                font-size: 1.5rem;
-            }
-
-            .chat-bubble {
-                font-size: 16px;
-            }
-        }
-
 
     </style>
 </head>
@@ -363,11 +330,6 @@
         <h1 id="shopTitle"></h1>
         <div id="header">
             <h2 id="formHeader"></h2>
-        </div>
-
-        <!-- Récapitulatif des réponses -->
-        <div id="recapContainer">
-            <!-- Les réponses de l'utilisateur apparaîtront ici -->
         </div>
 
         <!-- Conteneur pour structurer les échanges -->
@@ -381,6 +343,11 @@
                 <input type="text" id="userInput" placeholder="Votre réponse ici...">
                 <button id="submitBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
+        </div>
+
+        <!-- Récapitulatif des réponses -->
+        <div id="recapContainer">
+            <!-- Les réponses de l'utilisateur apparaîtront ici -->
         </div>
 
         <!-- Footer -->
@@ -655,9 +622,9 @@
                     generateEmailBtn.id = 'generateEmailBtn';
                     generateEmailBtn.style.backgroundColor = '#4CAF50';
                     generateEmailBtn.style.color = 'white';
-                    generateEmailBtn.style.fontSize= '1.6em';
                     generateEmailBtn.style.padding = '10px 20px'; // Un padding horizontal plus généreux pour une meilleure lisibilité
                     generateEmailBtn.style.border = 'none';
+                    generateEmailBtn.style.fontSize = '1.2em';
                     generateEmailBtn.style.borderRadius = '5px';
                     generateEmailBtn.style.cursor = 'pointer';
                     generateEmailBtn.style.whiteSpace = 'nowrap'; // Empêche le texte de se couper si trop long
